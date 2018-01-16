@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@loopback/context": "^4.0.0-alpha.25",
+    "@loopback/repository-json-schema": "^4.0.0-alpha.1",
     "loopback-datasource-juggler": "^3.9.2"
   },
   "files": [

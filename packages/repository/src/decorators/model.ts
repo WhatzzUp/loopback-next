@@ -14,6 +14,11 @@ import {
   ModelDefinitionSyntax,
   PropertyDefinition,
 } from '../model';
+import {
+  modelMetaToJsonDef,
+  JSON_SCHEMA_KEY,
+} from '@loopback/repository-json-schema';
+import {ModelMetadataHelper} from './metadata';
 
 export const MODEL_KEY = 'loopback:model';
 export const MODEL_PROPERTIES_KEY = 'loopback:model-properties';
@@ -63,6 +68,11 @@ export function model(definition?: Partial<ModelDefinitionSyntax>) {
     }
 
     target.definition = modelDef;
+
+    // turn metadata into json-schema and store it under JSON_SCHEMA_KEY
+    const meta = ModelMetadataHelper.getModelMetadata(target);
+    const jsonDef = modelMetaToJsonDef(meta);
+    MetadataInspector.defineMetadata(JSON_SCHEMA_KEY, jsonDef, target);
   };
 }
 

@@ -10,11 +10,11 @@ import {
   ModelDefinition,
   PropertyMap,
 } from '@loopback/repository';
-import {modelToJsonDef, toJsonProperty} from '../../src/build-schema';
+import {modelMetaToJsonDef, toJsonProperty} from '../../src/build-schema';
 import {expect} from '@loopback/testlab';
 
 describe('build-schema', () => {
-  describe('modelToJSON', () => {
+  describe('metaToJsonDef', () => {
     it('does not convert null or undefined property', () => {
       @model()
       class TestModel {
@@ -22,7 +22,8 @@ describe('build-schema', () => {
         @property() undef: undefined;
       }
 
-      const jsonDef = modelToJsonDef(TestModel);
+      const modelMeta = ModelMetadataHelper.getModelMetadata(TestModel);
+      const jsonDef = modelMetaToJsonDef(modelMeta);
       expect(jsonDef.properties).to.not.have.keys(['nul', 'undef']);
     });
 
@@ -38,8 +39,12 @@ describe('build-schema', () => {
         baz: number;
       }
 
-      expect(modelToJsonDef(NoPropertyMeta)).to.eql({});
-      expect(modelToJsonDef(OnePropertyDecorated)).to.deepEqual({
+      const noPropMeta = ModelMetadataHelper.getModelMetadata(NoPropertyMeta);
+      const onePropMeta = ModelMetadataHelper.getModelMetadata(
+        OnePropertyDecorated,
+      );
+      expect(modelMetaToJsonDef(noPropMeta)).to.eql({});
+      expect(modelMetaToJsonDef(onePropMeta)).to.deepEqual({
         properties: {
           foo: {
             type: 'string',
@@ -55,8 +60,10 @@ describe('build-schema', () => {
         bar: number;
       }
 
-      expect(modelToJsonDef(Empty)).to.eql({});
-      expect(modelToJsonDef(NoModelMeta)).to.eql({});
+      const emptyMeta = ModelMetadataHelper.getModelMetadata(Empty);
+      const noModelMeta = ModelMetadataHelper.getModelMetadata(NoModelMeta);
+      expect(modelMetaToJsonDef(emptyMeta)).to.eql({});
+      expect(modelMetaToJsonDef(noModelMeta)).to.eql({});
     });
 
     it('properly converts string, number, and boolean properties', () => {
@@ -67,7 +74,8 @@ describe('build-schema', () => {
         @property() bool: boolean;
       }
 
-      const jsonDef = modelToJsonDef(TestModel);
+      const modelMeta = ModelMetadataHelper.getModelMetadata(TestModel);
+      const jsonDef = modelMetaToJsonDef(modelMeta);
       expect(jsonDef.properties).to.deepEqual({
         str: {
           type: 'string',
@@ -87,7 +95,8 @@ describe('build-schema', () => {
         @property() obj: object;
       }
 
-      const jsonDef = modelToJsonDef(TestModel);
+      const modelMeta = ModelMetadataHelper.getModelMetadata(TestModel);
+      const jsonDef = modelMetaToJsonDef(modelMeta);
       expect(jsonDef.properties).to.deepEqual({
         obj: {
           type: 'object',
@@ -105,7 +114,8 @@ describe('build-schema', () => {
         @property() cusType: CustomType;
       }
 
-      const jsonDef = modelToJsonDef(TestModel);
+      const modelMeta = ModelMetadataHelper.getModelMetadata(TestModel);
+      const jsonDef = modelMetaToJsonDef(modelMeta);
       expect(jsonDef.properties).to.deepEqual({
         cusType: {
           $ref: '#definitions/CustomType',
@@ -119,7 +129,8 @@ describe('build-schema', () => {
         @property.array(Number) numArr: number[];
       }
 
-      const jsonDef = modelToJsonDef(TestModel);
+      const modelMeta = ModelMetadataHelper.getModelMetadata(TestModel);
+      const jsonDef = modelMetaToJsonDef(modelMeta);
       expect(jsonDef.properties).to.deepEqual({
         numArr: {
           type: 'array',
@@ -140,7 +151,8 @@ describe('build-schema', () => {
         @property.array(CustomType) cusArr: CustomType[];
       }
 
-      const jsonDef = modelToJsonDef(TestModel);
+      const modelMeta = ModelMetadataHelper.getModelMetadata(TestModel);
+      const jsonDef = modelMetaToJsonDef(modelMeta);
       expect(jsonDef.properties).to.deepEqual({
         cusArr: {
           type: 'array',
@@ -152,13 +164,11 @@ describe('build-schema', () => {
     });
 
     it('errors out when "@property.array" is not used on an array', () => {
-      @model()
-      class BadArray {
-        @property() badArr: string[];
-      }
-
       expect(() => {
-        modelToJsonDef(BadArray);
+        @model()
+        class BadArray {
+          @property() badArr: string[];
+        }
       }).to.throw(/type is defined as an array/);
     });
 

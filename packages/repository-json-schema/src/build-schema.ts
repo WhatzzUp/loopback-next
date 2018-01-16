@@ -3,13 +3,10 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {
-  ModelMetadataHelper,
-  PropertyDefinition,
-  ModelDefinition,
-} from '@loopback/repository';
 import {includes} from 'lodash';
 import {Definition} from 'typescript-json-schema';
+
+export const JSON_SCHEMA_KEY = 'loopback:json-schema';
 
 /**
  * Type definition for JSON Schema
@@ -18,16 +15,26 @@ export interface JsonDefinition extends Definition {
   properties?: {[property: string]: JsonDefinition};
 }
 
+// Spoofing of PropertyDefinition and ModelDefinition in @loopback/repository to
+// prevent circular dependency
+export type PropertyDefinition = {
+  type: Function | {};
+  [name: string]: {};
+};
+export type ModelDefinition = {
+  properties: {[name: string]: PropertyDefinition};
+  [name: string]: {};
+};
+
 // NOTE(shimks) no metadata for: union, optional, nested array, any, enum,
 // string literal, anonymous types, and inherited properties
 
 /**
- * Converts a TypeScript class into a JSON Schema using TypeScript's
- * reflection API
+ * Converts a LoopBack model class metadata into a JSON Schema using
+ * TypeScript's reflection API
  * @param ctor Constructor of class to convert from
  */
-export function modelToJsonDef(ctor: Function): JsonDefinition {
-  const meta: ModelDefinition = ModelMetadataHelper.getModelMetadata(ctor);
+export function modelMetaToJsonDef(meta: ModelDefinition): JsonDefinition {
   const schema: JsonDefinition = {};
 
   for (const p in meta.properties) {

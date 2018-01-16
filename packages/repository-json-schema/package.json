@@ -24,13 +24,12 @@
     "JSON Schema"
   ],
   "dependencies": {
-    "@loopback/openapi-spec": "^4.0.0-alpha.18",
-    "@loopback/repository": "^4.0.0-alpha.22",
     "lodash": "^4.17.4",
     "typescript-json-schema": "^0.20.0"
   },
   "devDependencies": {
     "@loopback/build": "^4.0.0-alpha.7",
+    "@loopback/repository": "4.0.0-alpha.23",
     "@loopback/testlab": "^4.0.0-alpha.17",
     "@types/lodash": "^4.14.92"
   },

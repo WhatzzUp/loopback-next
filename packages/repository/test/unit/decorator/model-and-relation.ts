@@ -20,6 +20,10 @@ import {
 
 import {Entity, ValueObject} from '../../../';
 import {MetadataInspector} from '@loopback/context';
+import {
+  JSON_SCHEMA_KEY,
+  JsonDefinition,
+} from '@loopback/repository-json-schema';
 
 describe('model decorator', () => {
   @model()
@@ -255,6 +259,30 @@ describe('model decorator', () => {
       ) || /* istanbul ignore next */ {};
     expect(meta.recentOrders).to.eql({
       type: RelationType.hasMany,
+    });
+  });
+
+  it('adds JSON Schema metadata', () => {
+    class CustomType {}
+
+    @model()
+    class MyModel {
+      @property() num: number;
+      @property() cusType: CustomType;
+      @property.array(String) arrStr: string[];
+    }
+    const jsonDef = MetadataInspector.getClassMetadata(
+      JSON_SCHEMA_KEY,
+      MyModel,
+    ) as JsonDefinition;
+    const props = jsonDef.properties as {[property: string]: JsonDefinition};
+    expect(props.num).to.deepEqual({type: 'number'});
+    expect(props.cusType).to.deepEqual({$ref: '#definitions/CustomType'});
+    expect(props.arrStr).to.deepEqual({
+      type: 'array',
+      items: {
+        type: 'string',
+      },
     });
   });
 
