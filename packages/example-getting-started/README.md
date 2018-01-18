@@ -20,21 +20,21 @@ certain technologies, languages and concepts.
 - [Using Git](https://githowto.com/)
 
 ## Setup
-1. Clone this repository if you haven't already:
+1. Install loopback-client
 ```
-git clone https://github.com/strongloop/loopback-next
+npm i -g @loopback/cli
 ```
-1. Bootstrap the monorepo
+2. Download the "getting-started" application
 ```
-npm i && npm run bootstrap
-```
-
-1. Switch to the `packages/example-getting-started` directory.
-```
-cd packages/example-getting-started
+lb4 example getting-started
 ```
 
-1. Run it!
+3. Switch to the directory and install dependencies
+```
+cd loopback4-example-getting-started && npm i
+```
+
+4. Start the app!
 ```
 npm start
 ```
